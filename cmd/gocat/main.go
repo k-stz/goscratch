@@ -8,8 +8,15 @@ import (
 	"os"
 )
 
+// It is a common patternin Go, for a function that allocates resources,
+// like this open(), to also provide a closure that cleans up the resource.
+// We provide "closer" closure, it "closes over" the allocated filedescriptor.
+// The caller can then defer the closure ensuring the file is closed upon use
+// or an error reported if any
 func open(filename string) (fd *os.File, closer func(), err error) {
 	fd, err = os.Open(filename)
+	// We provide a closure to the caller, that can be defer-ed
+	// it will ensure the file is closed and report errors if any
 	closer = func() {
 		fmt.Println("closing file!")
 		err = fd.Close()
