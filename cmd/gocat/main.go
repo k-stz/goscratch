@@ -22,11 +22,13 @@ func open(filename string) (fd *os.File, closer func(), err error) {
 
 func main() {
 	slog.Info("Arguments passed", "os.Args", os.Args, "len", len(os.Args))
-	filename := "test.txt"
+	var filename string
 	if len(os.Args) < 2 {
+		filename = "test.txt"
 		slog.Warn("Not enough args passed. Usage: gocat <file>")
 		slog.Warn("Using default filename.", "filename", filename)
-	
+	} else {
+		filename = os.Args[1]
 	}
 	// Path to file is relative to current working dir (os.Getwd())
 	cwd, _ := os.Getwd()
