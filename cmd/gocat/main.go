@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"log/slog"
 	"os"
 )
 
@@ -20,13 +21,16 @@ func open(filename string) (fd *os.File, closer func(), err error) {
 }
 
 func main() {
-	fmt.Println("Args:", os.Args)
-	// if len(os.Args) < 2 {
-	// 	log.Fatal("Not enough args passed. Usage: gocat <file>")
-	// }
-	fmt.Println(os.Getwd())
-	// Path is relative to current working dir (os.Getwd())
+	slog.Info("Arguments passed", "os.Args", os.Args, "len", len(os.Args))
 	filename := "test.txt"
+	if len(os.Args) < 2 {
+		slog.Warn("Not enough args passed. Usage: gocat <file>")
+		slog.Warn("Using default filename.", "filename", filename)
+	
+	}
+	// Path to file is relative to current working dir (os.Getwd())
+	cwd, _ := os.Getwd()
+	slog.Info("os.Getwd()", "cwd", cwd)
 	fd, closer, err := open(filename)
 
 	if err != nil {
