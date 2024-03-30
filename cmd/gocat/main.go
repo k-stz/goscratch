@@ -8,11 +8,14 @@ import (
 	"os"
 )
 
-// It is a common patternin Go, for a function that allocates resources,
-// like this open(), to also provide a closure that cleans up the resource.
-// We provide "closer" closure, it "closes over" the allocated filedescriptor.
+// It is a common pattern in Go, for a function that allocates resources,
+// like `open()`, to also provide a closure that cleans up the resource.
+// The `closer` closure, "closes over" the allocated filedescriptor.
 // The caller can then defer the closure ensuring the file is closed upon use
 // or an error reported if any
+// 
+// Other langs use blocks like try/catch/finally (java/JavaScript) 
+// or begin/rescure/ensure (Ruby) for this purpose instead.
 func open(filename string) (fd *os.File, closer func(), err error) {
 	fd, err = os.Open(filename)
 	// We provide a closure to the caller, that can be defer-ed
