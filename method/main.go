@@ -6,17 +6,17 @@ type Adder struct {
 	i int
 }
 
-type Arithmer struct {
+type TwoAdder struct {
 	// Adder is an "embedded field"!
 	// Fields will be directly accessible
-	// and Adder's methods will be promoted to Arithmer
+	// and Adder's methods will be promoted to TwoAdder
 	// and thus an Airthmer struct can use the AddTo()-method!
 	Adder
 	j int
 }
 
 func (a Adder) AddTo(value int) int {
-	fmt.Println("Adder's AddTo() called value:", value)
+	fmt.Println("Adder's AddTo called", value)
 	return a.i + value
 }
 
@@ -26,14 +26,8 @@ func (a Adder) Double(value int) int {
 	return a.AddTo(value * 2)
 }
 
-func (a Arithmer) Double(value int) int {
-	// Here we call AddTo on a, an instance of Adder
-	// SUch that the Adder's AddTo() will be called!
-	return a.AddTo(value * 2)
-}
-
-func (a Arithmer) AddTo(value int) int {
-	fmt.Println("Arithmer's AddTo() called value:", value)
+func (a TwoAdder) AddTo(value int) int {
+	fmt.Println("TwoAdder's AddTo() called value:", value)
 	return a.i + value
 }
 
@@ -47,9 +41,10 @@ func main() {
 	me := Adder.AddTo
 	fmt.Println(a, a.AddTo(4))
 	fmt.Println("method values:", mv(5), myAdder(8), me(Adder{1}, 13))
-	arith := Arithmer{Adder{3}, 4}
+	ta := TwoAdder{Adder{3}, 0}
 	fmt.Println("## Embedding test:")
 	//fmt.Println("arith:", arith, arith.AddTo(55))
-	fmt.Println("Double:", arith.Double(10))
+
+	fmt.Println("Double:", ta.Double(10))
 
 }
