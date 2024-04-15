@@ -20,7 +20,7 @@ type League struct {
 // MatchResult updates the Wins field in League
 // We're chaning Wins, shouldn't we use a pointer receiver? It will change
 // with a value receiver, because map is a reference type.
-func (l League) MatchResult(team1 string, score1 int, team2 string, score2 int) {
+func (l *League) MatchResult(team1 string, score1 int, team2 string, score2 int) {
 	switch {
 	case score1 > score2:
 		l.Wins[team1]++
