@@ -31,7 +31,13 @@ func NewSimpleDataStore() SimpleDataStore {
 	}
 }
 
-// Next we write some business logic
+// # Business Logic:
+// Next we want to write some business logic
+
+// # Dependencies:
+// Datastore: The business logic needsdata to work with, so it requires a datastore 
+// Logger: and it shall log when it get invoked, so it needs a logger
+// Thus here we define the dependencies (so that we can _inject_ it later!)
 
 // First it needs some data to work with, so it *depends* on a datastore
 type DataStore interface {
@@ -58,12 +64,13 @@ func (lg LoggerAdapter) Log(message string) {
 
 // Now that the _dependencies_ are defined, we can implement the business logic
 // Note how nothing in SimpleLogic mentions the concrete type of the Logger and
-// DataStore so we have _no_ dependency on them!
+// DataStore so we have _no_ dependency on them - we're decoupled:
 // We won't later have a problem swapping in new implementations from an entirely
 // different provider, because the provider has nothing to do with this interface
+//
 // This is very different from languages like Java:
 // Even though Java uses an interface to decouple the implementation from the
-// interfacethe explicit interfaces bind the client and the provider together
+// interface, the explicit interfaces binds the client and the provider together
 // This makes replacing a dependency in Java (and other langs with explicit
 // interfaces) far mor difficult than it is in Go
 type SimpleLogic struct {
@@ -72,7 +79,7 @@ type SimpleLogic struct {
 }
 
 // Note how the fields in the SimpleLogic struct are unexported!
-// Thus they can only be accessed code in this package.
+// Thus they can only be accessed by code in this package.
 // Though you can't enforce immutability in Go, you can limit which code can access
 // these fields making accidental modification less likely
 func NewSimpleLogic(l Logger, ds DataStore) SimpleLogic {
