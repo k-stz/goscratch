@@ -19,7 +19,7 @@ import (
 
 // IsValidLine returns true if string starts with validTag
 func IsValidLine(text string) bool {
-	re := regexp.MustCompile(`^(\[TRC\]|\[DBG\]|\[INF\]|\[WRN\]|\[ERR\]|\[FTL\])`)
+	re := regexp.MustCompile(`^\[(TRC|DBG|INF|WRN|ERR|FTL)\]`)
 	//fmt.Println("Match found:", re.FindString(text))
 	return re.MatchString(text)
 }
@@ -27,7 +27,7 @@ func IsValidLine(text string) bool {
 // SplitLogLine returns string split by token starting with '<' and ending with
 // '>' with optionally any of the following chars in between: '~*=-'
 func SplitLogLine(text string) []string {
-	re := regexp.MustCompile(`<[~*=-]+>`)
+	re := regexp.MustCompile(`<[~*=-]*>`)
 	//fmt.Println("Match found:", re.FindAllString(text, -1))
 	return re.Split(text, -1)
 }
@@ -35,7 +35,7 @@ func SplitLogLine(text string) []string {
 // Count any lines that contain "password", somewhere between quotes
 // and caseinsensitive
 func CountQuotedPasswords(lines []string) int {
-	re := regexp.MustCompile(`(?i)".*(password).*"`)
+	re := regexp.MustCompile(`(?i)".*password.*"`)
 	count := 0
 	for _, line := range lines {
 		match := re.MatchString(line)
@@ -59,12 +59,13 @@ func RemoveEndOfLineText(text string) string {
 // TagWithUserName tags a line that contains a "User" followed by
 // any number of spaces and a username with the tag: "[USR] <username>"
 func TagWithUserName(lines []string) []string {
-	re := regexp.MustCompile(`User(\s+)([[:alnum:]]+)`)
+	// instead of \w also [[:alnum:]] works
+	re := regexp.MustCompile(`User\s+(\w+)`)
 	for idx, line := range lines {
 		if re.MatchString(line) {
 			match := re.FindStringSubmatch(line)
-			//fmt.Println("match:", match[2])
-			name := match[2]
+			//fmt.Println("match:", match[1])
+			name := match[1]
 			lines[idx] = fmt.Sprintf("[USR] %s %s", name, lines[idx])
 		}
 	}
