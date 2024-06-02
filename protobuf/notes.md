@@ -41,3 +41,33 @@ protoc --go_out=. person.proto
 ```
 The result will be a file `./perso/person.pb.go` containing the protobuf struct implmenenting code!
 The struct herein finally implements the necessary interface to unmarshal/marshal a "Person" between the go struct "Person" and the protobuf wireformat for it.
+
+# Unmarshalling
+Very important: When unmarshalling a protobuf into a struct, the structs tag is crucial for it decides where which data is put into the struct.
+For example when Creating the protobuf based on a struct that with the following field:
+```go
+	Data map[string]string `protobuf:"bytes,2,rep,name=Data,proto3" 
+```
+Where the "2" after `"bytes,2,...` indicates the enum of the Message 
+in the `*.proto` file.
+
+Now when you use a different Struct for unmarshalling, that has multiple
+fields, make sure that the field has the same enum in its struct tag. 
+For example:
+```go
+	Data map[string]string `protobuf:"bytes,3,...`
+```
+Will _not_ unmarshal the data into the Data map becaue the enums don't match. 
+But instead you can create a protoc-struct that uses multiple fields, as long as the field you care about has the current enum matching the marshalled protobuf data. So the following would unmarshal it successfully, even though the struct has more fields then the marshalled protobuf:
+```go
+type DataBinaryDataConfigMap struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Data       map[string]string `protobuf:"bytes,2,rep,name=Data,proto3" json:"Data,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	BinaryData map[string]string `protobuf:"bytes,3,rep,name=BinaryData,proto3" json:"BinaryData,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+}
+```
+
+Here the `Data` field Data containing a map would properly receive the data!
