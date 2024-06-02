@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-option go_package = "./person";
-
-message Person {
-  string Name = 1;
-  int64 Age = 2;
-}

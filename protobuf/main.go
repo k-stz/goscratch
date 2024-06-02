@@ -4,8 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-
-	"github.com/k-stz/goscratch/protobuf/person"
+	"github.com/k-stz/goscratch/protobuf/lifeform"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -17,20 +16,8 @@ import (
 // 	age  int
 // }
 
-func main() {
-	bob := &person.Person{
-		Name: "Protobob",
-		Age:  200,
-	}
-	fmt.Println("Person:", bob)
-
-	b, err := proto.Marshal(bob)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(b)
- 
-	fo, err := os.Create("person-protobuf.pb")
+func writeProtobufToFile(b []byte, filename string) {
+	fo, err := os.Create(filename)
 	if err != nil {
 		panic(err)
 	}
@@ -52,4 +39,33 @@ func main() {
 	if err = w.Flush(); err != nil {
 		panic(err)
 	}
+}
+
+func readFileToByteSlice(filename string) []byte {
+	b, err := os.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
+	return b
+}
+
+func main() {
+	bob := &lifeform.Person{
+		Name: "Bob the Human",
+	}
+	fmt.Println("bob:", bob)
+
+	b, err := proto.Marshal(bob)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(b)
+
+	writeProtobufToFile(b, "person-protobuf.pb")
+
+	readProtobufBytes := readFileToByteSlice("person-protobuf.pb")
+	// lifeform.Person protobuf can be unmarshalled into lifeform.Animal!
+	someAnimal := new(lifeform.Animal)
+	proto.Unmarshal(readProtobufBytes, someAnimal)
+	fmt.Println("someAnimal:", someAnimal)
 }
