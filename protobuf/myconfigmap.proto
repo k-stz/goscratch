@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option go_package = "./myconfigmap";
+  
+message MyConfigMap { 
+	// configmap uses struct tag: protobuf:"bytes,2,rep,name=data"`
+  map<string, string> Data = 2; 
+}
+
+message MyConfigMap2 { 
+  map<string, string> Data = 3; 
+}
+
+message MyConfigMapSameEnumAs1 { 
+  map<string, string> Data = 2; 
+}
+
+message DataBinaryDataConfigMap { 
+  map<string, string> Data = 2; 
+  map<string, string> BinaryData = 3; 
+
+}

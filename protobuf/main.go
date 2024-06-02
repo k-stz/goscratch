@@ -4,8 +4,10 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"github.com/k-stz/goscratch/protobuf/lifeform"
+
+	"github.com/k-stz/goscratch/protobuf/myconfigmap"
 	"google.golang.org/protobuf/proto"
+	core "k8s.io/api/core/v1"
 )
 
 // core "k8s.io/api/core/v1"
@@ -50,22 +52,40 @@ func readFileToByteSlice(filename string) []byte {
 }
 
 func main() {
-	bob := &lifeform.Person{
-		Name: "Bob the Human",
+	fooDataMap := make(map[string]string)
+	fooDataMap["name"] = "My awesome ConfigMap protobuf test"
+	fooCM := &myconfigmap.MyConfigMap{
+		Data: fooDataMap,
 	}
-	fmt.Println("bob:", bob)
+	fmt.Println("myconfigmap", fooCM)
 
-	b, err := proto.Marshal(bob)
+	b, err := proto.Marshal(fooCM)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(b)
 
-	writeProtobufToFile(b, "person-protobuf.pb")
+	writeProtobufToFile(b, "my-protobuf.pb")
 
-	readProtobufBytes := readFileToByteSlice("person-protobuf.pb")
+	readProtobufBytes := readFileToByteSlice("my-protobuf.pb")
 	// lifeform.Person protobuf can be unmarshalled into lifeform.Animal!
-	someAnimal := new(lifeform.Animal)
-	proto.Unmarshal(readProtobufBytes, someAnimal)
-	fmt.Println("someAnimal:", someAnimal)
+	barCM := new(myconfigmap.MyConfigMapSameEnumAs1)
+	proto.Unmarshal(readProtobufBytes, barCM)
+	fmt.Println("MyConfigMapSameEnumAs1: ", barCM)
+
+	quxCMdifferntEnum := new(myconfigmap.MyConfigMap2)
+	proto.Unmarshal(readProtobufBytes, quxCMdifferntEnum)
+	fmt.Println("MyConfigMap2:           ", quxCMdifferntEnum)
+
+	bothConfigMap := new(myconfigmap.DataBinaryDataConfigMap)
+	proto.Unmarshal(readProtobufBytes, bothConfigMap)
+	fmt.Println("DataBinaryDataConfigMap:", bothConfigMap)
+
+	// COnfigMap
+	// Data map[string]string `json:"data,omitempty" protobuf:"bytes,2,rep,name=data"`
+	coreCMdataMap := make(map[string]string)
+	cm := core.ConfigMap{
+		Data: coreCMdataMap,
+	}
+	fmt.Println("core CM:", cm)
 }
